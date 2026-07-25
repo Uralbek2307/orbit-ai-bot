@@ -1,4 +1,5 @@
 import os
+import asyncio
 import requests
 from telegram import Update
 from telegram.ext import (
@@ -45,13 +46,21 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     answer = await ask_gemini(user_text)
     await waiting.edit_text(answer)
 
-def main():
+async def main():
     app = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    
     print("🚀 ORBIT AI (Gemini 3.5 Flash) 24/7 ISHGA TUSHDI!")
-    app.run_polling()
+    
+    await app.initialize()
+    await app.start()
+    await app.updater.start_polling()
+    
+    # Bot to'xtab qolmasligi uchun cheksiz kutish
+    stop_event = asyncio.Event()
+    await stop_event.wait()
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
     
