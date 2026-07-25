@@ -9,17 +9,12 @@ from telegram.ext import (
     filters
 )
 
-# =========================
-# TOKENLAR
-# =========================
 TELEGRAM_BOT_TOKEN = "8888432167:AAGtMhKxnkwsYevWAhuVHghVOUUTZ2HyL6Q"
 GEMINI_API_KEY = "AQ.Ab8RN6IX5NVGEC16q0Zeoah6RlGTHgJoKv1djECxKMM68Vp-vw"
 
 async def ask_gemini(user_text):
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key={GEMINI_API_KEY}"
-    
     headers = {"Content-Type": "application/json"}
-    
     data = {
         "contents": [{
             "parts": [{
@@ -27,7 +22,6 @@ async def ask_gemini(user_text):
             }]
         }]
     }
-    
     try:
         response = requests.post(url, json=data, headers=headers, timeout=30)
         if response.status_code == 200:
@@ -48,23 +42,16 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_text = update.message.text
     waiting = await update.message.reply_text("🤔 ORBIT AI o'ylayapti...")
-
     answer = await ask_gemini(user_text)
     await waiting.edit_text(answer)
 
-async def main():
+def main():
     app = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
-
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-
     print("🚀 ORBIT AI (Gemini 3.5 Flash) 24/7 ISHGA TUSHDI!")
-    
-    await app.initialize()
-    await app.start()
-    await app.updater.start_polling()
+    app.run_polling()
 
 if __name__ == "__main__":
-    import asyncio
-    asyncio.run(main())
+    main()
     
