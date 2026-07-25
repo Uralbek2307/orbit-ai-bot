@@ -11,7 +11,7 @@ from telegram.ext import (
 )
 
 TELEGRAM_BOT_TOKEN = "8888432167:AAGtMhKxnkwsYevWAhuVHghVOUUTZ2HyL6Q"
-GEMINI_API_KEY = "AQ.Ab8RN6JR7b4wtxKN1rqC_O25-4NexXW4OBgmS6HIY8-3rj9Xhw"
+GEMINI_API_KEY = "AQ.Ab8RN6LpcNuhZCvsg9gdJ3eJhVoHNR9Ld9FyVp49-8mgcIsy9g"
 
 async def ask_gemini(user_text):
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key={GEMINI_API_KEY}"
