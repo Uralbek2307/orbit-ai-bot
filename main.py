@@ -10,7 +10,7 @@ from telegram.ext import (
     filters
 )
 
-TELEGRAM_BOT_TOKEN = "8888432167:AAGtMhKxnkwsYevWAhuVHghVOUUTZ2HyL6Q"
+TELEGRAM_BOT_TOKEN = "8888432167:AAHTaoQIDAkYvkS9cCTcQwAOVDUgHmNx3ZI"
 GEMINI_API_KEY = "AQ.Ab8RN6LpcNuhZCvsg9gdJ3eJhVoHNR9Ld9FyVp49-8mgcIsy9g"
 
 async def ask_gemini(user_text):
