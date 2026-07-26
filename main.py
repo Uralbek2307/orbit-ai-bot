@@ -1,3 +1,5 @@
+import os
+import asyncio
 import requests
 from telegram import Update
 from telegram.ext import (
@@ -8,31 +10,28 @@ from telegram.ext import (
     filters
 )
 
-# =========================
-# MA'LUMOTLAR
-# =========================
-TELEGRAM_BOT_TOKEN = "8888432167:AAGtMhKxnkwsYevWAhuVHghVOUUTZ2HyL6Q"
-GEMINI_API_KEY = "AQ.Ab8RN6IX5NVGEC16q0Zeoah6RlGTHgJoKv1djECxKMM68Vp-vw"
+TELEGRAM_BOT_TOKEN = "8888432167:AAHTaoQIDAkYvkS9cCTcQwAOVDUgHmNx3ZI"
+OPENAI_API_KEY = "Sk-svcacct-hmSgAEUl4pZsft5HhS6Yh6JYsOWq98IVhHLeVf9gX-lt25V4IXBMCuNCrt0LF-8iisiZ-rfc8ET3BlbkFJ7sq1oZD53EZV7WErEh8Vc7i9YmCO9pimTJ5BkZUJDDFBH3-8y0bIfa0GRVcqY1-cT7gSQvPc8A"
 
-def ask_gemini(user_text):
-    # Gemini 3.5 Flash modeli uchun so'rov manzili
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key={GEMINI_API_KEY}"
-    
-    headers = {"Content-Type": "application/json"}
-    
-    data = {
-        "contents": [{
-            "parts": [{
-                "text": f"Sening isming ORBIT AI 💎🤖. O'zingni har doim ORBIT AI deb tanishtir. Savolga o'zbek tilida qisqa va aniq javob ber: {user_text}"
-            }]
-        }]
+async def ask_openai(user_text):
+    url = "https://api.openai.com/v1/chat/completions"
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {OPENAI_API_KEY}"
     }
-    
+    data = {
+        "model": "gpt-4o-mini",
+        "messages": [
+            {"role": "system", "content": "Sening isming ORBIT AI 💎🤖. O'zingni har doim ORBIT AI deb tanishtir. Savolga o'zbek tilida qisqa va aniq javob ber."},
+            {"role": "user", "content": user_text}
+        ],
+        "temperature": 0.7
+    }
     try:
         response = requests.post(url, json=data, headers=headers, timeout=30)
         if response.status_code == 200:
             result = response.json()
-            return result["candidates"][0]["content"]["parts"][0]["text"]
+            return result["choices"][0]["message"]["content"]
         else:
             return f"API Xatosi: {response.json().get('error', {}).get('message', response.text)}"
     except Exception as e:
@@ -41,25 +40,30 @@ def ask_gemini(user_text):
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "🚀 Assalomu alaykum!\n\n"
-        "Men **ORBIT AI**man (Gemini 3.5 Flash asosida) 💎🤖\n"
+        "Men **ORBIT AI**man (OpenAI asosida) 💎🤖\n"
         "Sizning shaxsiy sun'iy intellekt yordamchingizman. Savolingizni yozing."
     )
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_text = update.message.text
     waiting = await update.message.reply_text("🤔 ORBIT AI o'ylayapti...")
-
-    answer = ask_gemini(user_text)
+    answer = await ask_openai(user_text)
     await waiting.edit_text(answer)
 
-def main():
+async def main():
     app = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
-
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-
-    print("🚀 ORBIT AI (Gemini 3.5 Flash) ISHGA TUSHDI!")
-    app.run_polling()
+    
+    print("🚀 ORBIT AI (OpenAI) 24/7 ISHGA TUSHDI!")
+    
+    await app.initialize()
+    await app.start()
+    await app.updater.start_polling(drop_pending_updates=True)
+    
+    stop_event = asyncio.Event()
+    await stop_event.wait()
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
+    
